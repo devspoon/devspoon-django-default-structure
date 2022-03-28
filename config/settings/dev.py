@@ -19,13 +19,11 @@ export DJANGO_SETTINGS_MODULE=config.settings.stage
 export DJANGO_SETTINGS_MODULE=config.settings.prod
 """
 
-DEBUG='DEBUG_STATE'
 
-ALLOWED_HOSTS = ['ALLOWED_HOSTS_IP']
 
 # debug toolbar를 동작시키기 위한 서버 ip 정보를 명시함
 INTERNAL_IPS = [
-    'IP_ADDRESSES'
+    config('IP_ADDRESSES')
 ]
 
 DEBUG_TOOLBAR_PANELS = [
@@ -81,37 +79,58 @@ MIDDLEWARE += [
 # https://uiandwe.tistory.com/1252
 # https://django-orm-cookbook-ko.readthedocs.io/en/latest/multiple_databases.html
 
+# Databse Test Database setting, Multidatabase setting
+# https://stackoverflow.com/questions/4650509/different-db-for-testing-in-django
+# https://docs.djangoproject.com/en/4.0/topics/testing/overview/#the-test-database
+# https://docs.djangoproject.com/en/4.0/topics/testing/advanced/#topics-testing-advanced-multidb
+
+# pytest fixture with database
+# https://djangostars.com/blog/django-pytest-testing/ # remove later
+
+# replication
+# https://docs.djangoproject.com/en/4.0/topics/db/multi-db/
+# https://vixxcode.tistory.com/220
+# https://koenwoortman.com/python-django-replication-database-router/
+# https://andrewbrookins.com/python/scaling-django-with-postgres-read-replicas/
+# https://sophilabs.com/blog/configure-a-read-replica-database-in-django
+# https://urunimi.github.io/architecture/python/use-replica/
+
+DATABASE_ROUTERS = ['core.replica_router.ReplicationRouter']
+
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": os.path.join(ROOT_DIR, "db.sqlite3"),
+    # },
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(ROOT_DIR, "db.sqlite3"),
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': config('DEFAULT_DB_HOST'),
+        'PORT': config('DEFAULT_DB_PORT',default=3306, cast=int),
+        'NAME': config('DEFAULT_DB_NAME'),
+        'USER': config('DEFAULT_DB_USER'),
+        'PASSWORD': config('DEFAULT_DB_PASSWORD'),
+        'CHARSET': config('DEFAULT_DB_CHARSET'),
+        # 'TEST': {
+        #     'NAME': config('DEFAULT_DB_TEST_NAME)'
+        # }
+        # * 주의 TEST 파라미터는 데이터베이스 사용후 삭제함
+     },
+    'replica1': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': config('REPLICA1_DB_HOST'),
+        'PORT': config('DEFAULT_DB_PORT',default=3306, cast=int),
+        'NAME': config('REPLICA1_DB_NAME'),
+        'USER': config('REPLICA1_DB_USER'),
+        'PASSWORD': config('REPLICA1_DB_PASSWORD'),
+        'CHARSET': config('REPLICA1_DB_CHARSET'),
+        # 'TEST': {
+        #     'NAME': config('REPLICA1_DB_TEST_NAME)'
+        # }
+        # * 주의 TEST 파라미터는 데이터베이스 사용후 삭제함
     },
-    # 'mysql_CUD': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': 3306,
-    #     'NAME': 'django_test',
-    #     'USER': 'django-test',
-    #     'PASSWORD': 'test1324',
-    #     'CHARSET': 'utf8',
-    #     # 'TEST': {
-    #     #     'NAME': 'test1324'
-    #     # }
-    #     # * 주의 TEST 파라미터는 데이터베이스 사용후 삭제함
-    # },
-    # 'mysql_R': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': 3306,
-    #     'NAME': 'django_test',
-    #     'USER': 'django-test',
-    #     'PASSWORD': 'test1324',
-    #     'CHARSET': 'utf8',
-    #     # 'TEST': {
-    #     #     'NAME': 'test1324'
-    #     # }
-    # },
 }
+
+#AUTH_USER_MODEL = 'users.User'
 
 # reference blog : https://velog.io/@kim6515516/Django-silk-%EC%84%B1%EB%8A%A5-%ED%94%84%EB%A1%9C%ED%8C%8C%EC%9D%BC%EB%9F%AC
 # reference github : https://github.com/jazzband/django-silk
