@@ -19,7 +19,9 @@ export DJANGO_SETTINGS_MODULE=config.settings.stage
 export DJANGO_SETTINGS_MODULE=config.settings.prod
 """
 
+DEBUG=config('DEBUG_STATE')
 
+ALLOWED_HOSTS = [config('ALLOWED_HOSTS_IP')]
 
 # debug toolbar를 동작시키기 위한 서버 ip 정보를 명시함
 INTERNAL_IPS = [
@@ -137,3 +139,22 @@ DATABASES = {
 
 SILKY_PYTHON_PROFILER = True
 SILKY_PYTHON_PROFILER_BINARY = True
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(ROOT_DIR, "media")
+
+STATIC_URL = "/static/"
+# STATIC_URL = "/assets/"
+# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     STATIC_DIR,
+# ]
+# OR
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static'
+# ]
+
+# static url로 접근했을 때 연결되는 위치 정의
+# static 파일을 한 곳에 모아서 서비스 할 경우 상위 STATICFILES_DIRS 변수는 불필요함
+
+STATIC_ROOT = os.path.join(ROOT_DIR, "static")
