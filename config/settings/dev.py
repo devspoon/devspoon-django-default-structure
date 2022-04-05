@@ -12,6 +12,9 @@ from decouple import config
 # import json
 # print(json.dumps(DEFAULT_LOGGING, indent=4, sort_keys=True))
 
+import mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
+
 """
 export DJANGO_SETTINGS_MODULE=config.settings.dev
 export DJANGO_SETTINGS_MODULE=config.settings.test
@@ -42,7 +45,6 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.logging.LoggingPanel",
     "debug_toolbar.panels.redirects.RedirectsPanel",
 ]
-
 
 def custom_show_toolbar(self):
     return True
