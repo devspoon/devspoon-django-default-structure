@@ -15,6 +15,12 @@ from pathlib import Path
 from decouple import config
 from os.path import join
 
+# from .sub_settings.email.gmail import *
+# from .sub_settings.email.sendblue import *
+# from .sub_settings.email.mailgun import *
+# from .sub_settings.email.sendgrid import *
+# from .sub_settings.email.aws_ses import *
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)

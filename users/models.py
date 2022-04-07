@@ -10,7 +10,7 @@ from django.db import models
 from django.db.models import F
 from django.contrib.auth.models import AbstractUser
 
-from utils.model_utils import date_upload_to
+from utils.os.model_utils import date_upload_to
 
 # Create your models here.
 
@@ -25,6 +25,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=200, unique=True, null=True) # it can be null for synchronization of social account
     nickname = models.CharField(verbose_name=_('Nick Name'),null=False, max_length=30)
     gender = models.SmallIntegerField(verbose_name=_('Gender'),choices = Gender.choices, default=Gender.NO_DISCLOSE)
+    verified = models.BooleanField(verbose_name=_('Email verified State'),default=False)
     profile_image = models.ImageField(verbose_name=_('User Profile Image'),upload_to=date_upload_to, default='default/no_img.png')
     photo_thumbnail = ImageSpecField(
         source="profile_image",  # 원본 IageField이름

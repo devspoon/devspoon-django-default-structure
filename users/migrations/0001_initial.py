@@ -7,7 +7,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.db.models.expressions
 import django.utils.timezone
-import utils.model_utils
+import utils.os.model_utils
 
 
 class Migration(migrations.Migration):
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=200, null=True, unique=True)),
                 ('nickname', models.CharField(max_length=30, verbose_name='Nick Name')),
                 ('gender', models.SmallIntegerField(choices=[('0', 'Female'), ('1', 'Male'), ('2', 'Not to disclose')], default='2', verbose_name='Gender')),
-                ('profile_image', models.ImageField(default='default/no_img.png', upload_to=utils.model_utils.date_upload_to, verbose_name='User Profile Image')),
+                ('profile_image', models.ImageField(default='default/no_img.png', upload_to=utils.os.model_utils.date_upload_to, verbose_name='User Profile Image')),
                 ('is_deleted', models.BooleanField(default=False, verbose_name='Deleted State')),
                 ('updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Updated Time')),
                 ('deleted_at', models.DateTimeField(null=True, verbose_name='Deleted Time')),
