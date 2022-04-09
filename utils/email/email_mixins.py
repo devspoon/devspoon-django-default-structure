@@ -1,3 +1,4 @@
+from pickle import TRUE
 import uuid
 import hashlib
 
@@ -15,38 +16,43 @@ from django.conf import settings
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.template import loader
 
 class VerifyEmailMixin:
-    email_template_name = '/email/registration_verification.html'
+    email_template_name_generator_token = '/email/registration_verification.html'
+    email_template_name_custom_token = '/email/verification.html'
     token_generator = default_token_generator
 
-    def send_verification_email_management(self, template: str, sender: str, user: object, email_vendor_code: int = 1, token_gen_type: int = 1 ) -> NoReturn:
-        if template is not None:
-            email_template_name = template
+    def send_verification_email_management(self, template: str, from_email: str, user: object, token_gen_type: int = 1 ) -> dict[str, Union[int, str]]:
 
-        if token_gen_type is 1:
-            # use default_token_generator
-            self.__create_verification_email_generator(sender, user)
+        if token_gen_type == 1:
+            if template is not None:
+                self.email_template_name_generator_token = template
+
+            return self.__create_verification_email_generator_token(from_email, user)
         else :
-            # use custom token generator
-            self.__create_verification_email_custom_token(self, sender, user)
+            if template is not None:
+                self.email_template_name_custom_token = template
+
+            return self.__create_verification_email_custom_token(from_email, user)
 
 
-    def __create_verification_email_generator_token(self, sender, user: object) -> HttpResponse:
-        token = self.token_generator.make_token(user)
-        url = self.__build_verification_link(user, token)
-
+    def __create_verification_email_generator_token(self, from_email: str, user: object) -> dict[str, Union[int, str]]:
+        result = {}
+        result['token'] = self.token_generator.make_token(user)
+        url = self.__build_verification_link(result['token'])
         subject = '회원가입을 축하드립니다.'
         message = '다음 주소로 이동하셔서 인증하세요. {}'.format(url)
-        html_message = render(self.request, self.email_template_name, {'url': url}).content.decode('utf-8')
-        send_mail(subject, message, sender, [user.email], html_message, fail_silently=True) # fail_silently=false, failure notification
+        html_message = render(self.request, settings.TEMPLATE_DIR + self.email_template_name_generator_token, {'url': url}).content.decode('utf-8')
+        result['sending_mail_num'] = send_mail(subject, message, from_email, [user.email], html_message=html_message, fail_silently=True)  # fail_silently=False, failure notification
+        return result
 
 
-    def __build_verification_link(self, user, token) -> str:
-        return '{}/user/{}/verify/{}/'.format(self.request.META.get('HTTP_ORIGIN'), user.pk, token)
+    def __build_verification_link(self, token: str) -> str:
+        return '{}{}{}/'.format(self.request.META.get('HTTP_ORIGIN'), reverse('users:verification_email'), '?key=' + token)
 
 
-    def __create_email_key(user_id) -> NoReturn:
+    def __create_email_key(self, user_id) -> str:
         random_key = str(uuid.uuid4())
         sha_data = hashlib.sha256()
         sha_data.update(str(user_id).encode('utf-8'))
@@ -55,23 +61,27 @@ class VerifyEmailMixin:
         return random_key[::2] + hash_key[::2]
 
 
-    def __create_verification_email_custom_token(self, sender, user) -> NoReturn:
-        key = self.__create_email_key(user.id)
-        link = 'http://' + self.request.get_host() + reverse('verification') + '?key=' + key
+    def __create_verification_email_custom_token(self, from_email: str, user: object) -> dict[str, Union[int, str]]:
+        result = {}
+        result['token'] = self.__create_email_key(user.id)
+        link = 'http://' + self.request.get_host() + reverse('users:verification_email') + '?key=' + result['token']
 
         # expired_at = timezone.now() + timedelta(days=3)
         # UserVerification.objects.create(user=user, key=key, expired_at=expired_at)
 
         email_context = { 'link': link }
-        msg_plain = render_to_string('email/verification.txt', email_context)
-        msg_html = render_to_string('email/verification.html', email_context)
-
+        # msg_plain = render_to_string('email/verification.txt', email_context)
+        # msg_html = render_to_string('email/verification.html', email_context)
+        msg_plain = render_to_string(settings.TEMPLATE_DIR + self.email_template_name_custom_token.replace('.html','.txt'), email_context)
+        msg_html = render_to_string(settings.TEMPLATE_DIR + self.email_template_name_custom_token, email_context)
         subject = '회원가입을 축하드립니다. 이메일 인증을 완료해 주세요'
-        send_mail(
-            subject, 
+        result['sending_mail_num'] = send_mail(
+            subject,
             msg_plain,
-            sender,
+            from_email,
             [user.email],
             html_message=msg_html,
             fail_silently=True
         )
+
+        return result
