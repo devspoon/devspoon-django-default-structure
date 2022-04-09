@@ -4,5 +4,12 @@ __pycache__/
 # database
 db.sqlite3
 
+# secure files
+# **/.env
+# .env
+
 # log
 logs/
+
+# prof files
+*.prof
