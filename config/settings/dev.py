@@ -2,8 +2,7 @@ from .base import *
 # from .sub_settings.debug.nose import * #NOSE coverage trace
 # from .sub_settings.http.cors import *
 from .sub_settings.system.logs import *
-
-# from .sub_settings.email.gmail import *
+from .sub_settings.oauth.allauth_default import *
 
 # from .sub_settings.oauth import *
 from decouple import config
@@ -28,7 +27,7 @@ ALLOWED_HOSTS = [config('ALLOWED_HOSTS_IP')]
 
 # debug toolbar를 동작시키기 위한 서버 ip 정보를 명시함
 INTERNAL_IPS = [
-    config('IP_ADDRESSES')
+    config('IP_ADDRESSES1'),config('IP_ADDRESSES2'),
 ]
 
 DEBUG_TOOLBAR_PANELS = [
@@ -49,7 +48,6 @@ DEBUG_TOOLBAR_PANELS = [
 def custom_show_toolbar(self):
     return True
 
-
 DEBUG_TOOLBAR_CONFIG = {
     "INTERCEPT_REDIRECTS": False,
     "ENABLE_STACKTRACES": True,
@@ -63,6 +61,7 @@ INSTALLED_APPS += [
     'django_extensions',
 ]
 
+
 # django-extentions로 ERP 만들때 해줘야 하는 설정
 GRAPH_MODELS = {
     "all_applications": True,
@@ -73,7 +72,6 @@ MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "silk.middleware.SilkyMiddleware",
 ]
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -134,23 +132,23 @@ DATABASES = {
     },
 }
 
-#AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 
 # reference blog : https://velog.io/@kim6515516/Django-silk-%EC%84%B1%EB%8A%A5-%ED%94%84%EB%A1%9C%ED%8C%8C%EC%9D%BC%EB%9F%AC
 # reference github : https://github.com/jazzband/django-silk
 
-SILKY_PYTHON_PROFILER = True
-SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_PYTHON_PROFILER = False
+SILKY_PYTHON_PROFILER_BINARY = False
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(ROOT_DIR, "media")
 
 STATIC_URL = "/static/"
 # STATIC_URL = "/assets/"
-# STATIC_DIR = os.path.join(BASE_DIR, 'static')
-# STATICFILES_DIRS = [
-#     STATIC_DIR,
-# ]
+STATIC_DIR = os.path.join(ROOT_DIR, 'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 # OR
 # STATICFILES_DIRS = [
 #     BASE_DIR / 'static'
@@ -159,4 +157,5 @@ STATIC_URL = "/static/"
 # static url로 접근했을 때 연결되는 위치 정의
 # static 파일을 한 곳에 모아서 서비스 할 경우 상위 STATICFILES_DIRS 변수는 불필요함
 
-STATIC_ROOT = os.path.join(ROOT_DIR, "static")
+# STATIC_ROOT = os.path.join(ROOT_DIR, "static")
+
